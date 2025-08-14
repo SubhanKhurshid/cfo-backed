@@ -1,0 +1,60 @@
+{
+  "profit_and_loss": {
+    "total_revenue": 213200.0,
+    "total_expenses": 342360.0,
+    "gross_profit": 108200.0,
+    "net_income": -234160.0,
+    "revenue_breakdown": {
+      "consulting_income": 35000.0,
+      "cleaning_income": 178200.0,
+      "other_income": 0.0
+    },
+    "expense_breakdown": {
+      "cogs": 105000.0,
+      "operating_expenses": 237360.0,
+      "interest_expense": 6000.0
+    }
+  },
+  "balance_sheet": {
+    "total_assets": 0.0,
+    "total_liabilities": 0.0,
+    "total_equity": 0.0,
+    "current_assets": 0.0,
+    "current_liabilities": 0.0,
+    "cash": 0.0,
+    "accounts_receivable": 0.0,
+    "accounts_payable": 0.0
+  },
+  "cash_flow_statement": {
+    "operating_cash_flow": 0.0,
+    "investing_cash_flow": 0.0,
+    "financing_cash_flow": 0.0,
+    "net_cash_change": 0.0,
+    "beginning_cash": 0.0,
+    "ending_cash": 0.0
+  },
+  "financial_ratios": {
+    "gross_profit_margin": 0.51,
+    "net_profit_margin": -1.1,
+    "current_ratio": 0.0,
+    "debt_to_equity": 0.0,
+    "return_on_equity": 0.0
+  },
+  "ar_aging": {
+    "total_ar": 0.0,
+    "current_30_days": 0.0,
+    "past_due_31_90_days": 0.0,
+    "past_due_over_90_days": 0.0
+  },
+  "ap_aging": {
+    "total_ap": 0.0,
+    "current_30_days": 0.0,
+    "past_due_31_90_days": 0.0,
+    "past_due_over_90_days": 0.0
+  },
+  "key_insights": [
+    "The company has a significant net loss of $234,160 over the 12-month period.",
+    "The gross profit margin is 50.7%, indicating a relatively stable pricing strategy.",
+    "The company has a high operating expense ratio, which is a concern for future sustainability."
+  ]
+}

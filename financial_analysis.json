@@ -1,67 +1,162 @@
 {
-  "financial_summary": {
-    "total_revenue": 213200.0,
-    "total_expense": 342360.0,
-    "net_profit": -234160.0,
-    "gross_profit": 108200.0
-  },
-  "revenue_breakdown": {
-    "consulting_income": 35000.0,
-    "cleaning_income": 178200.0,
-    "app_income": 0.0,
-    "other_income": 0.0
-  },
-  "expense_breakdown": {
-    "cost_of_goods_sold": 105000.0,
-    "advertising_promotion": 60000.0,
-    "cleaning_expenses": 30000.0,
-    "automobile_expense": 14400.0,
-    "rent_expense": 48000.0,
-    "insurance_expense": 16800.0,
-    "professional_fees": 6000.0,
-    "office_supplies": 7200.0,
-    "other_expenses": 0.0
-  },
-  "top_accounts": {
-    "highest_revenue_source": {
-      "account_name": "Cleaning Income",
-      "amount": 178200.0
+  "profit_and_loss": {
+    "revenue": {
+      "consulting_income": 35000.0,
+      "cleaning_income": 178200.0,
+      "app_income": 0.0,
+      "other_revenue": 0.0,
+      "total_revenue": 213200.0
     },
-    "highest_expense_category": {
-      "account_name": "Advertising and Promotion",
-      "amount": 60000.0
-    }
+    "cost_of_goods_sold": {
+      "direct_costs": 0.0,
+      "labor_costs": 0.0,
+      "materials": 0.0,
+      "total_cogs": 105000.0
+    },
+    "gross_profit": 108200.0,
+    "operating_expenses": {
+      "advertising_promotion": 60000.0,
+      "rent_expense": 48000.0,
+      "insurance_expense": 16800.0,
+      "professional_fees": 6000.0,
+      "office_supplies": 7200.0,
+      "automobile_expense": 14400.0,
+      "utilities": 6000.0,
+      "depreciation": 60000.0,
+      "other_operating_expenses": 342360.0,
+      "total_operating_expenses": 342360.0
+    },
+    "operating_income": -234160.0,
+    "other_income_expense": {
+      "interest_income": 0.0,
+      "interest_expense": 6000.0,
+      "other_income": 0.0,
+      "total_other": -6000.0
+    },
+    "net_income_before_taxes": -234160.0,
+    "income_tax_expense": 21600.0,
+    "net_income": -255760.0
+  },
+  "balance_sheet": {
+    "assets": {
+      "current_assets": {
+        "cash_and_equivalents": 0.0,
+        "accounts_receivable": 0.0,
+        "inventory": 0.0,
+        "prepaid_expenses": 0.0,
+        "other_current_assets": 0.0,
+        "total_current_assets": 0.0
+      },
+      "non_current_assets": {
+        "equipment": 0.0,
+        "accumulated_depreciation": 0.0,
+        "net_equipment": 0.0,
+        "intangible_assets": 0.0,
+        "other_assets": 0.0,
+        "total_non_current_assets": 0.0
+      },
+      "total_assets": 0.0
+    },
+    "liabilities": {
+      "current_liabilities": {
+        "accounts_payable": 0.0,
+        "accrued_expenses": 0.0,
+        "short_term_debt": 0.0,
+        "current_portion_long_term_debt": 0.0,
+        "other_current_liabilities": 0.0,
+        "total_current_liabilities": 0.0
+      },
+      "long_term_liabilities": {
+        "long_term_debt": 0.0,
+        "other_long_term_liabilities": 0.0,
+        "total_long_term_liabilities": 0.0
+      },
+      "total_liabilities": 0.0
+    },
+    "equity": {
+      "owner_equity": 0.0,
+      "retained_earnings": -255760.0,
+      "current_year_earnings": -234160.0,
+      "total_equity": -255760.0
+    },
+    "total_liabilities_and_equity": 0.0
+  },
+  "cash_flow_statement": {
+    "operating_activities": {
+      "net_income": -234160.0,
+      "depreciation_amortization": 60000.0,
+      "changes_in_working_capital": {
+        "accounts_receivable_change": 0.0,
+        "inventory_change": 0.0,
+        "prepaid_expenses_change": 0.0,
+        "accounts_payable_change": 0.0,
+        "accrued_expenses_change": 0.0,
+        "total_working_capital_change": 0.0
+      },
+      "other_operating_adjustments": 0.0,
+      "net_cash_from_operating": -174160.0
+    },
+    "investing_activities": {
+      "equipment_purchases": 0.0,
+      "asset_sales": 0.0,
+      "other_investments": 0.0,
+      "net_cash_from_investing": 0.0
+    },
+    "financing_activities": {
+      "owner_contributions": 0.0,
+      "owner_withdrawals": 0.0,
+      "loan_proceeds": 0.0,
+      "loan_payments": 0.0,
+      "other_financing": 0.0,
+      "net_cash_from_financing": 0.0
+    },
+    "net_change_in_cash": -174160.0,
+    "beginning_cash_balance": 0.0,
+    "ending_cash_balance": -174160.0
   },
   "financial_ratios": {
-    "gross_profit_margin": 0.51,
-    "net_profit_margin": -1.1,
-    "expense_ratio": 1.61
+    "liquidity_ratios": {
+      "current_ratio": 0.0,
+      "quick_ratio": 0.0,
+      "cash_ratio": 0.0
+    },
+    "profitability_ratios": {
+      "gross_profit_margin": 0.51,
+      "operating_profit_margin": -1.1,
+      "net_profit_margin": -1.2,
+      "return_on_assets": 0.0,
+      "return_on_equity": 0.0
+    },
+    "efficiency_ratios": {
+      "asset_turnover": 0.0,
+      "receivables_turnover": 0.0,
+      "inventory_turnover": 0.0
+    },
+    "leverage_ratios": {
+      "debt_to_assets": 0.0,
+      "debt_to_equity": 0.0,
+      "interest_coverage": -39.05
+    }
   },
-  "monthly_analysis": {
-    "average_monthly_revenue": 17766.67,
-    "average_monthly_expenses": 28530.0,
-    "trend": "declining"
+  "monthly_trends": {
+    "revenue_trend": "increasing",
+    "expense_trend": "increasing",
+    "profit_trend": "decreasing",
+    "monthly_data": []
   },
   "recommendations": [
     {
-      "category": "cost_reduction",
-      "recommendation": "Review and optimize advertising expenses",
-      "priority": "high"
-    },
-    {
-      "category": "cost_reduction",
-      "recommendation": "Analyze and adjust cleaning expenses",
-      "priority": "medium"
+      "category": "profitability",
+      "recommendation": "Reduce operating expenses to improve profitability",
+      "priority": "high",
+      "financial_statement": "P&L"
     }
   ],
   "anomalies": [
     {
-      "description": "Significant increase in total expenses",
-      "impact": "high"
-    },
-    {
-      "description": "Negative net income for most months",
-      "impact": "high"
+      "description": "High depreciation expense",
+      "impact": "high",
+      "financial_statement": "P&L"
     }
   ]
 }

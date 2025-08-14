@@ -1,1 +1,9 @@
 openai
+pandas
+python-dotenv
+openpyxl
+PyPDF2
+pdfplumber
+fastapi
+uvicorn
+python-multipart
