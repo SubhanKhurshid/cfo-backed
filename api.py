@@ -260,9 +260,24 @@ json
   "financial_ratios": {
     "gross_profit_margin": 0.00,
     "net_profit_margin": 0.00,
+    "ebitda_margin": 0.00,
     "current_ratio": 0.00,
     "debt_to_equity": 0.00,
     "return_on_equity": 0.00
+  },
+  "key_kpis": {
+    "ebitda": 0.00,
+    "ar_days": 0.00,
+    "ap_days": 0.00,
+    "working_capital": 0.00,
+    "cash_conversion_cycle": 0.00,
+    "revenue_growth_rate": 0.00
+  },
+  "cash_flow_trends": {
+    "monthly_operating_cf": [],
+    "monthly_free_cf": [],
+    "cf_trend": "stable",
+    "seasonal_patterns": "none"
   },
   "ar_aging": {
     "total_ar": 0.00,
@@ -278,9 +293,44 @@ json
   },
   "key_insights": [
     "Most important financial insight",
-    "Key recommendation",
+    "Key recommendation",  
     "Notable trend or anomaly"
-  ]
+  ],
+  "ai_powered_insights": {
+    "trend_analysis": [
+      {
+        "metric": "revenue",
+        "trend": "increasing",
+        "confidence": "high",
+        "description": "Revenue showing upward trend over analysis period"
+      }
+    ],
+    "anomaly_detection": [
+      {
+        "metric": "expenses",
+        "anomaly_type": "spike",
+        "severity": "medium",
+        "description": "Unusual expense spike detected in operating costs",
+        "recommendation": "Review operating expense categories for cost control"
+      }
+    ],
+    "pattern_recognition": [
+      {
+        "pattern_type": "seasonal",
+        "description": "Revenue shows seasonal patterns with Q4 peaks",
+        "impact": "positive"
+      }
+    ],
+    "predictive_insights": [
+      {
+        "forecast": "cash_flow",
+        "prediction": "negative",
+        "timeframe": "next_quarter",
+        "confidence": "medium",
+        "action_required": "Improve collections and reduce expenses"
+      }
+    ]
+  }
 }
 ```        
 
@@ -290,6 +340,21 @@ ACCOUNT CLASSIFICATION:
 - Assets: Cash, AR, Equipment → balance_sheet assets
 - Liabilities: AP, Loans → balance_sheet liabilities
 - Equity: Owner equity, retained earnings → balance_sheet equity
+
+MANDATORY KPI CALCULATIONS:
+- EBITDA = Net Income + Interest + Taxes + Depreciation + Amortization
+- AR Days = (Accounts Receivable / Revenue) × 365
+- AP Days = (Accounts Payable / Cost of Goods Sold) × 365
+- Working Capital = Current Assets - Current Liabilities
+- Cash Conversion Cycle = AR Days + Inventory Days - AP Days
+- Margins: Gross, Net, EBITDA margins as percentages
+
+AI-POWERED ANALYSIS REQUIREMENTS:
+- TREND ANALYSIS: Identify increasing/decreasing patterns in revenue, expenses, profitability
+- ANOMALY DETECTION: Flag unusual spikes, drops, or outliers in financial metrics
+- PATTERN RECOGNITION: Detect seasonal patterns, cyclical trends, recurring anomalies  
+- PREDICTIVE INSIGHTS: Provide forward-looking analysis and early warning signals
+- BENCHMARKING: Compare current performance to historical data and industry standards
 
 REQUIREMENTS:
 1. Extract real numbers from the financial data
@@ -465,9 +530,24 @@ def ensure_complete_structure(parsed_result):
         "financial_ratios": {
             "gross_profit_margin": 0.00,
             "net_profit_margin": 0.00,
+            "ebitda_margin": 0.00,
             "current_ratio": 0.00,
             "debt_to_equity": 0.00,
             "return_on_equity": 0.00
+        },
+        "key_kpis": {
+            "ebitda": 0.00,
+            "ar_days": 0.00,
+            "ap_days": 0.00,
+            "working_capital": 0.00,
+            "cash_conversion_cycle": 0.00,
+            "revenue_growth_rate": 0.00
+        },
+        "cash_flow_trends": {
+            "monthly_operating_cf": [],
+            "monthly_free_cf": [],
+            "cf_trend": "stable",
+            "seasonal_patterns": "none"
         },
         "ar_aging": {
             "total_ar": 0.00,
@@ -485,7 +565,21 @@ def ensure_complete_structure(parsed_result):
             "Financial analysis completed based on available data",
             "Key metrics have been calculated", 
             "Review data for accuracy"
-        ]
+        ],
+        "ai_powered_insights": {
+            "trend_analysis": [
+                {"metric": "revenue", "trend": "stable", "confidence": "medium", "description": "Revenue baseline established"}
+            ],
+            "anomaly_detection": [
+                {"metric": "general", "anomaly_type": "none", "severity": "low", "description": "No significant anomalies detected", "recommendation": "Continue monitoring"}
+            ],
+            "pattern_recognition": [
+                {"pattern_type": "baseline", "description": "Establishing baseline patterns for future comparison", "impact": "neutral"}
+            ],
+            "predictive_insights": [
+                {"forecast": "performance", "prediction": "stable", "timeframe": "next_period", "confidence": "low", "action_required": "Gather more historical data for better predictions"}
+            ]
+        }
     }
     
     def deep_merge(base_dict, update_dict):
@@ -533,21 +627,134 @@ def ensure_complete_structure(parsed_result):
         complete_template["profit_and_loss"]["gross_profit"] = parsed_result.get("gross_profit", 0.00)
         complete_template["profit_and_loss"]["net_income"] = parsed_result.get("net_income", 0.00)
         
-        # Calculate financial ratios from the data
+        # Calculate financial ratios and KPIs from the data
         total_revenue = complete_template["profit_and_loss"]["total_revenue"]
         gross_profit = complete_template["profit_and_loss"]["gross_profit"] 
         net_income = complete_template["profit_and_loss"]["net_income"]
+        total_cogs = complete_template["profit_and_loss"]["expense_breakdown"]["cogs"]
+        
+        # Extract depreciation if available (from operating expenses)
+        depreciation = parsed_result.get("operating_expenses", {}).get("depreciation", 0.00)
+        interest_expense = complete_template["profit_and_loss"]["expense_breakdown"]["interest_expense"]
+        
+        # Calculate EBITDA
+        ebitda = net_income + interest_expense + 0 + depreciation  # Assuming no taxes separately tracked
+        complete_template["key_kpis"]["ebitda"] = ebitda
         
         if total_revenue > 0:
             complete_template["financial_ratios"]["gross_profit_margin"] = round((gross_profit / total_revenue) * 100, 2)
             complete_template["financial_ratios"]["net_profit_margin"] = round((net_income / total_revenue) * 100, 2)
+            complete_template["financial_ratios"]["ebitda_margin"] = round((ebitda / total_revenue) * 100, 2)
         
-        # Add key insights based on the data
-        complete_template["key_insights"] = [
-            f"Total Revenue: ${total_revenue:,.2f}",
-            f"Net Income: ${net_income:,.2f}",
-            f"Gross Profit Margin: {complete_template['financial_ratios']['gross_profit_margin']}%"
-        ]
+        # Calculate working capital KPIs (basic estimates)
+        current_assets = complete_template["balance_sheet"]["current_assets"]
+        current_liabilities = complete_template["balance_sheet"]["current_liabilities"]
+        accounts_receivable = complete_template["balance_sheet"]["accounts_receivable"]
+        accounts_payable = complete_template["balance_sheet"]["accounts_payable"]
+        
+        complete_template["key_kpis"]["working_capital"] = current_assets - current_liabilities
+        
+        # Calculate AR and AP days if we have the data
+        if total_revenue > 0 and accounts_receivable > 0:
+            complete_template["key_kpis"]["ar_days"] = round((accounts_receivable / total_revenue) * 365, 1)
+        
+        if total_cogs > 0 and accounts_payable > 0:
+            complete_template["key_kpis"]["ap_days"] = round((accounts_payable / total_cogs) * 365, 1)
+        
+        # Calculate cash conversion cycle
+        ar_days = complete_template["key_kpis"]["ar_days"]
+        ap_days = complete_template["key_kpis"]["ap_days"]
+        inventory_days = 0  # Simplified - could be calculated if inventory data available
+        complete_template["key_kpis"]["cash_conversion_cycle"] = ar_days + inventory_days - ap_days
+        
+        # Add key insights based on the data including KPIs
+        insights = []
+        insights.append(f"Revenue: ${total_revenue:,.2f}, Net Income: ${net_income:,.2f}")
+        insights.append(f"EBITDA: ${ebitda:,.2f} ({complete_template['financial_ratios']['ebitda_margin']}% margin)")
+        
+        if complete_template["key_kpis"]["ar_days"] > 0:
+            insights.append(f"AR Days: {complete_template['key_kpis']['ar_days']} days")
+        else:
+            insights.append("Gross Profit Margin: {:.1f}%".format(complete_template['financial_ratios']['gross_profit_margin']))
+            
+        complete_template["key_insights"] = insights
+        
+        # Add AI-powered trend and anomaly analysis
+        ai_insights = {
+            "trend_analysis": [],
+            "anomaly_detection": [],
+            "pattern_recognition": [],
+            "predictive_insights": []
+        }
+        
+        # Revenue trend analysis
+        if total_revenue > 0:
+            if net_income < 0:
+                ai_insights["trend_analysis"].append({
+                    "metric": "profitability",
+                    "trend": "declining", 
+                    "confidence": "high",
+                    "description": f"Company operating at a loss with negative net income of ${net_income:,.2f}"
+                })
+            else:
+                ai_insights["trend_analysis"].append({
+                    "metric": "profitability",
+                    "trend": "positive",
+                    "confidence": "high", 
+                    "description": f"Profitable operations with net income of ${net_income:,.2f}"
+                })
+        
+        # EBITDA trend analysis  
+        if ebitda < 0:
+            ai_insights["trend_analysis"].append({
+                "metric": "ebitda",
+                "trend": "concerning",
+                "confidence": "high",
+                "description": f"Negative EBITDA of ${ebitda:,.2f} indicates operational challenges"
+            })
+        
+        # Anomaly detection based on financial ratios
+        gross_margin = complete_template['financial_ratios']['gross_profit_margin']
+        net_margin = complete_template['financial_ratios']['net_profit_margin'] 
+        
+        if gross_margin > 70:
+            ai_insights["anomaly_detection"].append({
+                "metric": "gross_margin",
+                "anomaly_type": "high_margin", 
+                "severity": "medium",
+                "description": f"Unusually high gross margin of {gross_margin}% - verify pricing strategy",
+                "recommendation": "Review pricing model and cost structure for sustainability"
+            })
+        elif gross_margin < 20:
+            ai_insights["anomaly_detection"].append({
+                "metric": "gross_margin",
+                "anomaly_type": "low_margin",
+                "severity": "high", 
+                "description": f"Low gross margin of {gross_margin}% indicates pricing pressure",
+                "recommendation": "Optimize costs or increase pricing to improve margins"
+            })
+        
+        # Cash flow predictions
+        if net_income < -100000:
+            ai_insights["predictive_insights"].append({
+                "forecast": "cash_flow",
+                "prediction": "negative",
+                "timeframe": "next_quarter",
+                "confidence": "high",
+                "action_required": "Immediate cost reduction and cash flow management required"
+            })
+        
+        # Pattern recognition for expense structure
+        if total_revenue > 0:
+            expense_ratio = (complete_template["profit_and_loss"]["total_expenses"] / total_revenue) * 100
+            if expense_ratio > 150:
+                ai_insights["pattern_recognition"].append({
+                    "pattern_type": "expense_structure",
+                    "description": f"High expense ratio of {expense_ratio:.1f}% indicates operational inefficiencies",
+                    "impact": "negative"
+                })
+        
+        complete_template["ai_powered_insights"] = ai_insights
         
         # Set basic balance sheet data (derived from P&L)
         complete_template["balance_sheet"]["total_equity"] = net_income
@@ -668,9 +875,24 @@ You are a financial analyst. Analyze the financial data and return ONLY this JSO
   "financial_ratios": {
     "gross_profit_margin": 0.00,
     "net_profit_margin": 0.00,
+    "ebitda_margin": 0.00,
     "current_ratio": 0.00,
     "debt_to_equity": 0.00,
     "return_on_equity": 0.00
+  },
+  "key_kpis": {
+    "ebitda": 0.00,
+    "ar_days": 0.00,
+    "ap_days": 0.00,
+    "working_capital": 0.00,
+    "cash_conversion_cycle": 0.00,
+    "revenue_growth_rate": 0.00
+  },
+  "cash_flow_trends": {
+    "monthly_operating_cf": [],
+    "monthly_free_cf": [],
+    "cf_trend": "stable",
+    "seasonal_patterns": "none"
   },
   "ar_aging": {
     "total_ar": 0.00,
@@ -686,9 +908,44 @@ You are a financial analyst. Analyze the financial data and return ONLY this JSO
   },
   "key_insights": [
     "Key insight from analysis",
-    "Important recommendation",
+    "Important recommendation", 
     "Notable finding"
-  ]
+  ],
+  "ai_powered_insights": {
+    "trend_analysis": [
+      {
+        "metric": "revenue",
+        "trend": "increasing",
+        "confidence": "high",
+        "description": "Revenue showing upward trend over analysis period"
+      }
+    ],
+    "anomaly_detection": [
+      {
+        "metric": "expenses", 
+        "anomaly_type": "spike",
+        "severity": "medium",
+        "description": "Unusual expense spike detected in operating costs",
+        "recommendation": "Review operating expense categories for cost control"
+      }
+    ],
+    "pattern_recognition": [
+      {
+        "pattern_type": "seasonal",
+        "description": "Revenue shows seasonal patterns with Q4 peaks",
+        "impact": "positive"
+      }
+    ],
+    "predictive_insights": [
+      {
+        "forecast": "cash_flow", 
+        "prediction": "negative",
+        "timeframe": "next_quarter",
+        "confidence": "medium",
+        "action_required": "Improve collections and reduce expenses"
+      }
+    ]
+  }
 }
 
 Extract real numbers from the data. Return valid JSON only."""
@@ -745,12 +1002,25 @@ Extract real numbers from the data. Return valid JSON only."""
                 "beginning_cash": 0.00, "ending_cash": 0.00
             },
             "financial_ratios": {
-                "gross_profit_margin": 0.00, "net_profit_margin": 0.00, "current_ratio": 0.00,
-                "debt_to_equity": 0.00, "return_on_equity": 0.00
-            },
+                            "gross_profit_margin": 0.00, "net_profit_margin": 0.00, "ebitda_margin": 0.00,
+            "current_ratio": 0.00, "debt_to_equity": 0.00, "return_on_equity": 0.00
+        },
+        "key_kpis": {
+            "ebitda": 0.00, "ar_days": 0.00, "ap_days": 0.00, "working_capital": 0.00,
+            "cash_conversion_cycle": 0.00, "revenue_growth_rate": 0.00
+        },
+        "cash_flow_trends": {
+            "monthly_operating_cf": [], "monthly_free_cf": [], "cf_trend": "stable", "seasonal_patterns": "none"
+        },
             "ar_aging": {"total_ar": 0.00, "current_30_days": 0.00, "past_due_31_90_days": 0.00, "past_due_over_90_days": 0.00},
             "ap_aging": {"total_ap": 0.00, "current_30_days": 0.00, "past_due_31_90_days": 0.00, "past_due_over_90_days": 0.00},
             "key_insights": ["Analysis failed - manual review required", f"Error: {str(e)}"],
+            "ai_powered_insights": {
+                "trend_analysis": [{"metric": "error", "trend": "unknown", "confidence": "low", "description": "Unable to analyze trends due to data processing error"}],
+                "anomaly_detection": [{"metric": "system", "anomaly_type": "error", "severity": "high", "description": "Analysis system error", "recommendation": "Retry with different data format"}],
+                "pattern_recognition": [{"pattern_type": "error", "description": "Pattern analysis unavailable", "impact": "unknown"}],
+                "predictive_insights": [{"forecast": "unavailable", "prediction": "unknown", "timeframe": "n/a", "confidence": "none", "action_required": "Fix data processing issues"}]
+            },
             "error": f"Both analyses failed: {str(e)}"
         }
 
