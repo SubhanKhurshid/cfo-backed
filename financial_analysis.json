@@ -1,0 +1,67 @@
+{
+  "financial_summary": {
+    "total_revenue": 213200.0,
+    "total_expense": 342360.0,
+    "net_profit": -234160.0,
+    "gross_profit": 108200.0
+  },
+  "revenue_breakdown": {
+    "consulting_income": 35000.0,
+    "cleaning_income": 178200.0,
+    "app_income": 0.0,
+    "other_income": 0.0
+  },
+  "expense_breakdown": {
+    "cost_of_goods_sold": 105000.0,
+    "advertising_promotion": 60000.0,
+    "cleaning_expenses": 30000.0,
+    "automobile_expense": 14400.0,
+    "rent_expense": 48000.0,
+    "insurance_expense": 16800.0,
+    "professional_fees": 6000.0,
+    "office_supplies": 7200.0,
+    "other_expenses": 0.0
+  },
+  "top_accounts": {
+    "highest_revenue_source": {
+      "account_name": "Cleaning Income",
+      "amount": 178200.0
+    },
+    "highest_expense_category": {
+      "account_name": "Advertising and Promotion",
+      "amount": 60000.0
+    }
+  },
+  "financial_ratios": {
+    "gross_profit_margin": 0.51,
+    "net_profit_margin": -1.1,
+    "expense_ratio": 1.61
+  },
+  "monthly_analysis": {
+    "average_monthly_revenue": 17766.67,
+    "average_monthly_expenses": 28530.0,
+    "trend": "declining"
+  },
+  "recommendations": [
+    {
+      "category": "cost_reduction",
+      "recommendation": "Review and optimize advertising expenses",
+      "priority": "high"
+    },
+    {
+      "category": "cost_reduction",
+      "recommendation": "Analyze and adjust cleaning expenses",
+      "priority": "medium"
+    }
+  ],
+  "anomalies": [
+    {
+      "description": "Significant increase in total expenses",
+      "impact": "high"
+    },
+    {
+      "description": "Negative net income for most months",
+      "impact": "high"
+    }
+  ]
+}
