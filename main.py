@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import tempfile
 import os
 from pathlib import Path
@@ -19,6 +20,15 @@ app = FastAPI(
     title="CFO Financial Analysis API",
     description="Upload financial documents (CSV, XLSX, PDF) and get comprehensive financial analysis including P&L, Balance Sheet, Cash Flow, and AR/AP Aging reports",
     version="1.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Allowed file extensions

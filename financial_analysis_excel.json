@@ -1,18 +1,58 @@
 {
   "profit_and_loss": {
-    "total_revenue": 213200.0,
-    "total_expenses": 342360.0,
-    "gross_profit": 108200.0,
-    "net_income": -234160.0,
+    "total_revenue": 0.0,
+    "total_expenses": 0.0,
+    "gross_profit": 0.0,
+    "net_income": 0.0,
     "revenue_breakdown": {
-      "consulting_income": 35000.0,
-      "cleaning_income": 178200.0,
+      "consulting_income": 0.0,
+      "cleaning_income": 0.0,
       "other_income": 0.0
     },
     "expense_breakdown": {
-      "cogs": 105000.0,
-      "operating_expenses": 237360.0,
-      "interest_expense": 6000.0
+      "cogs": 0.0,
+      "operating_expenses": 0.0,
+      "interest_expense": 0.0
+    },
+    "revenue_analysis": {
+      "total_revenue": 213200,
+      "revenue_streams": {
+        "primary_revenue": 35000,
+        "secondary_revenue": 178200,
+        "recurring_revenue": 178200,
+        "one_time_revenue": 35000
+      },
+      "revenue_quality_metrics": {
+        "recurring_percentage": 83.56,
+        "customer_concentration_risk": "medium",
+        "revenue_predictability": 83.56
+      }
+    },
+    "cost_structure": {
+      "total_expenses": 342360,
+      "cost_categories": {
+        "direct_costs": 105000,
+        "operating_expenses": 237360,
+        "administrative_costs": 0,
+        "financing_costs": 0
+      },
+      "cost_behavior": {
+        "fixed_costs": 237360,
+        "variable_costs": 105000,
+        "semi_variable_costs": 0
+      }
+    },
+    "profitability_metrics": {
+      "gross_profit": 108200,
+      "operating_profit": -234160,
+      "ebitda": -234160,
+      "net_income": -234160,
+      "margins": {
+        "gross_margin": 50.73,
+        "operating_margin": -109.83,
+        "ebitda_margin": -109.83,
+        "net_margin": -109.83
+      }
     }
   },
   "balance_sheet": {
@@ -23,7 +63,44 @@
     "current_liabilities": 0.0,
     "cash": 0.0,
     "accounts_receivable": 0.0,
-    "accounts_payable": 0.0
+    "accounts_payable": 0.0,
+    "assets": {
+      "total_assets": 0,
+      "current_assets": {
+        "cash_and_equivalents": 0,
+        "accounts_receivable": 0,
+        "inventory": 0,
+        "prepaid_expenses": 0,
+        "total_current": 0
+      },
+      "non_current_assets": {
+        "property_equipment": 0,
+        "intangible_assets": 0,
+        "investments": 0,
+        "total_non_current": 0
+      }
+    },
+    "liabilities": {
+      "total_liabilities": 0,
+      "current_liabilities": {
+        "accounts_payable": 0,
+        "accrued_expenses": 0,
+        "short_term_debt": 0,
+        "total_current": 0
+      },
+      "long_term_liabilities": {
+        "long_term_debt": 0,
+        "deferred_tax": 0,
+        "other_long_term": 0,
+        "total_long_term": 0
+      }
+    },
+    "equity": {
+      "total_equity": 0,
+      "owner_equity": 0,
+      "retained_earnings": 0,
+      "current_year_earnings": 0
+    }
   },
   "cash_flow_statement": {
     "operating_cash_flow": 0.0,
@@ -34,11 +111,52 @@
     "ending_cash": 0.0
   },
   "financial_ratios": {
-    "gross_profit_margin": 0.51,
-    "net_profit_margin": -1.1,
+    "gross_profit_margin": 0.0,
+    "net_profit_margin": 0.0,
+    "ebitda_margin": 0.0,
     "current_ratio": 0.0,
     "debt_to_equity": 0.0,
-    "return_on_equity": 0.0
+    "return_on_equity": 0.0,
+    "profitability_ratios": {
+      "gross_profit_margin": 50.73,
+      "operating_profit_margin": -109.83,
+      "net_profit_margin": -109.83,
+      "return_on_assets": 0,
+      "return_on_equity": 0,
+      "return_on_invested_capital": 0
+    },
+    "liquidity_ratios": {
+      "current_ratio": 0,
+      "quick_ratio": 0,
+      "cash_ratio": 0,
+      "operating_cash_flow_ratio": 0
+    },
+    "efficiency_ratios": {
+      "asset_turnover": 0,
+      "inventory_turnover": 0,
+      "receivables_turnover": 0,
+      "payables_turnover": 0
+    },
+    "leverage_ratios": {
+      "debt_to_equity": 0,
+      "debt_to_assets": 0,
+      "interest_coverage": 0,
+      "debt_service_coverage": 0
+    }
+  },
+  "key_kpis": {
+    "ebitda": 0.0,
+    "ar_days": 0.0,
+    "ap_days": 0.0,
+    "working_capital": 0.0,
+    "cash_conversion_cycle": 0.0,
+    "revenue_growth_rate": 0.0
+  },
+  "cash_flow_trends": {
+    "monthly_operating_cf": [],
+    "monthly_free_cf": [],
+    "cf_trend": "stable",
+    "seasonal_patterns": "none"
   },
   "ar_aging": {
     "total_ar": 0.0,
@@ -53,8 +171,270 @@
     "past_due_over_90_days": 0.0
   },
   "key_insights": [
-    "The company has a significant net loss of $234,160 over the 12-month period.",
-    "The gross profit margin is 50.7%, indicating a relatively stable pricing strategy.",
-    "The company has a high operating expense ratio, which is a concern for future sustainability."
+    "Financial analysis completed based on available data",
+    "Key metrics have been calculated",
+    "Review data for accuracy"
+  ],
+  "ai_powered_insights": {
+    "trend_analysis": [
+      {
+        "metric": "revenue",
+        "trend_direction": "declining",
+        "trend_strength": "strong",
+        "statistical_confidence": 0.95,
+        "forecast_next_period": 0,
+        "key_drivers": []
+      }
+    ],
+    "anomaly_detection": [
+      {
+        "metric": "gross_profit",
+        "anomaly_type": "drop",
+        "severity": "critical",
+        "deviation_percentage": 200,
+        "root_cause_hypothesis": "Sustained negative net income",
+        "recommended_investigation": "Review sales strategies and cost cuttings"
+      }
+    ],
+    "pattern_recognition": [
+      {
+        "pattern_type": "seasonal",
+        "pattern_description": "Drop in revenue after Apr 24",
+        "business_impact": "negative",
+        "seasonality_index": 1,
+        "optimization_opportunity": "Improvement in client acquisition strategies"
+      }
+    ],
+    "predictive_insights": [
+      {
+        "forecast": "performance",
+        "prediction": "stable",
+        "timeframe": "next_period",
+        "confidence": "low",
+        "action_required": "Gather more historical data for better predictions"
+      }
+    ],
+    "predictive_alerts": [
+      {
+        "alert_type": "profitability",
+        "alert_level": "red",
+        "forecast_horizon": "3_months",
+        "probability": 0.9,
+        "potential_impact": -300000,
+        "preventive_actions": [
+          "Initiate cost reduction strategies"
+        ]
+      }
+    ],
+    "performance_benchmarking": {
+      "industry_comparison": {
+        "gross_margin_percentile": 25,
+        "operating_efficiency_rank": "bottom_quartile",
+        "cash_management_score": 0.2
+      }
+    }
+  },
+  "executive_summary": {
+    "business_health_score": 45,
+    "financial_strength": "weak",
+    "key_performance_indicators": {
+      "revenue_trend": "declining",
+      "profitability_trend": "deteriorating",
+      "cash_position": "concerning",
+      "operational_efficiency": "needs_improvement"
+    },
+    "critical_alerts": [
+      "Sustained negative net income from May 24 to Mar 25."
+    ]
+  },
+  "cash_flow_analysis": {
+    "operating_activities": {
+      "net_cash_from_operations": -234160,
+      "cash_conversion_efficiency": 0,
+      "operating_cash_margin": 0
+    },
+    "investing_activities": {
+      "capital_expenditures": 0,
+      "asset_disposals": 0,
+      "net_investing_cash_flow": 0
+    },
+    "financing_activities": {
+      "debt_changes": 0,
+      "equity_changes": 0,
+      "dividends_distributions": 0,
+      "net_financing_cash_flow": 0
+    },
+    "cash_position": {
+      "beginning_cash": 0,
+      "ending_cash": 0,
+      "net_change_in_cash": 0,
+      "free_cash_flow": -234160
+    }
+  },
+  "working_capital_management": {
+    "working_capital_metrics": {
+      "gross_working_capital": 0,
+      "net_working_capital": 0,
+      "working_capital_ratio": 0,
+      "working_capital_turnover": 0
+    },
+    "ar_aging_analysis": {
+      "total_receivables": 0,
+      "current_0_30_days": 0,
+      "past_due_31_60_days": 0,
+      "past_due_61_90_days": 0,
+      "past_due_over_90_days": 0,
+      "collection_efficiency": 0,
+      "bad_debt_risk": "low"
+    },
+    "ap_aging_analysis": {
+      "total_payables": 0,
+      "current_0_30_days": 0,
+      "aging_31_60_days": 0,
+      "aging_61_90_days": 0,
+      "aging_over_90_days": 0,
+      "payment_performance": "poor"
+    },
+    "cash_conversion_cycle": {
+      "days_sales_outstanding": 0,
+      "days_inventory_outstanding": 0,
+      "days_payable_outstanding": 0,
+      "cash_cycle_days": 0,
+      "cycle_efficiency": "needs_improvement"
+    }
+  },
+  "what_if_scenarios": {
+    "revenue_impact_analysis": {
+      "baseline_scenario": {
+        "revenue": 213200,
+        "net_income": -234160,
+        "cash_flow": -234160
+      },
+      "revenue_decrease_10_percent": {
+        "revenue": 191880,
+        "net_income": -255640,
+        "cash_flow": -255640,
+        "impact_assessment": "severe"
+      },
+      "revenue_decrease_20_percent": {
+        "revenue": 170560,
+        "net_income": -277120,
+        "cash_flow": -277120,
+        "impact_assessment": "severe"
+      },
+      "revenue_decrease_30_percent": {
+        "revenue": 149240,
+        "net_income": -298600,
+        "cash_flow": -298600,
+        "impact_assessment": "severe"
+      },
+      "revenue_increase_20_percent": {
+        "revenue": 255840,
+        "net_income": -191280,
+        "cash_flow": -191280,
+        "scalability_constraints": []
+      }
+    },
+    "cost_optimization_scenarios": {
+      "fixed_cost_reduction_15_percent": {
+        "cost_savings": 31200,
+        "net_income_impact": -202960,
+        "feasibility": "high"
+      },
+      "variable_cost_optimization_10_percent": {
+        "cost_savings": 10500,
+        "margin_improvement": 58.91,
+        "implementation_difficulty": "moderate"
+      }
+    },
+    "cash_flow_stress_testing": {
+      "best_case_scenario": {
+        "months_of_runway": 0,
+        "peak_cash_position": 0
+      },
+      "worst_case_scenario": {
+        "months_of_runway": 0,
+        "cash_shortage_risk": "critical"
+      },
+      "break_even_analysis": {
+        "break_even_revenue": 342360,
+        "margin_of_safety": -129160,
+        "operating_leverage": 0
+      }
+    }
+  },
+  "strategic_recommendations": {
+    "immediate_actions_0_30_days": [
+      {
+        "priority": "critical",
+        "action": "Review and cut non-essential costs",
+        "expected_impact": 30000,
+        "implementation_cost": 0,
+        "success_metrics": [
+          "Reduced monthly expense by 15%"
+        ]
+      }
+    ],
+    "short_term_improvements_1_6_months": [
+      {
+        "initiative": "Increase marketing campaigns",
+        "business_case": "Expand customer base",
+        "investment_required": 20000,
+        "expected_roi": 0.2,
+        "risk_factors": [
+          "Market volatility"
+        ]
+      }
+    ],
+    "long_term_strategic_initiatives_6_24_months": [
+      {
+        "strategic_objective": "Expand consulting services",
+        "investment_timeline": "12 months",
+        "expected_outcomes": [
+          "25% increase in revenue"
+        ],
+        "success_criteria": [
+          "Revenue targets met"
+        ],
+        "risk_mitigation": [
+          "Diversification of services"
+        ]
+      }
+    ],
+    "growth_opportunities": [
+      {
+        "opportunity_type": "market_expansion",
+        "revenue_potential": 50000,
+        "investment_required": 10000,
+        "timeline_to_impact": "9 months",
+        "feasibility_score": 0.7
+      }
+    ],
+    "risk_mitigation_strategies": [
+      {
+        "risk_category": "financial",
+        "risk_level": "high",
+        "mitigation_approach": "Implement cost control measures",
+        "cost_of_mitigation": 1000,
+        "monitoring_metrics": [
+          "Expense ratio"
+        ]
+      }
+    ]
+  },
+  "executive_dashboard_kpis": {
+    "financial_health_score": 45,
+    "burn_rate_months_remaining": 0,
+    "revenue_growth_rate": -100,
+    "customer_acquisition_efficiency": 0,
+    "operational_excellence_score": 30,
+    "competitive_position_strength": 20
+  },
+  "key_insights_summary": [
+    "Critical negative net income trend needs immediate reversal.",
+    "Expanding services could unlock new revenue opportunities.",
+    "Cost reductions are essential to stabilize financial standing.",
+    "High expenditure without corresponding revenue is a major risk.",
+    "Focus on strategic cost management for long-term stabilization."
   ]
 }

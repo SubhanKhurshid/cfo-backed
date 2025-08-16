@@ -10,10 +10,10 @@ import pdfplumber
 load_dotenv()
 
 # Initialize OpenAI client with Gemini API
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(
-    base_url="https://api.groq.com/openai/v1",
-    api_key=GROQ_API_KEY
+    
+    api_key=OPENAI_API_KEY
 )
 
 def read_excel_file(file_path):
@@ -675,14 +675,11 @@ IMPORTANT: Return ONLY valid JSON. No explanations, no markdown, no additional t
 """
 
         response = client.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
-            ],
-            temperature=0,
-            max_tokens=8192,  # Max tokens for this model
-            top_p=1.0
+            ]
         )
         
         analysis_result = response.choices[0].message.content
@@ -1248,16 +1245,14 @@ Extract real numbers from the data. Return valid JSON only."""
         file_type_map = {'excel': 'Excel', 'pdf': 'PDF', 'csv': 'CSV'}
         file_type_text = file_type_map.get(file_type, file_type.upper())
         
-        user_message = f"Analyze this {file_type_text} financial data:\n\n{financial_data[:1500]}..."  # Limit input data
+        user_message = f"Analyze this {file_type_text} financial data:\n\n{financial_data}..."  # Limit input data
         
         response = client.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": simplified_prompt},
                 {"role": "user", "content": user_message}
-            ],
-            temperature=0,
-            max_tokens=2000  # Increased for complete response
+            ]
         )
         
         result = response.choices[0].message.content
