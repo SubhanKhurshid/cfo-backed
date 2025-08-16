@@ -735,7 +735,8 @@ IMPORTANT: Return ONLY valid JSON. No explanations, no markdown, no additional t
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
-            ]
+            ],
+           
         )
         
         analysis_result = response.choices[0].message.content
@@ -1308,7 +1309,8 @@ Extract real numbers from the data. Return valid JSON only."""
             messages=[
                 {"role": "system", "content": simplified_prompt},
                 {"role": "user", "content": user_message}
-            ]
+            ],
+            
         )
         
         result = response.choices[0].message.content
