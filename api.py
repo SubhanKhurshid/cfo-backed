@@ -17,22 +17,78 @@ client = OpenAI(
 )
 
 def read_excel_file(file_path):
-    """Read and process the Excel file - simplified version"""
+    """Read and process Excel files (XLSX and XLS) with improved sheet detection"""
     try:
         if not os.path.exists(file_path):
             print(f"File not found: {file_path}")
             return None, None
         
-        print(f"Reading file: {file_path}")
+        print(f"Reading Excel file: {file_path}")
         
-        # Read from Sheet1 (where the data is located)
-        df = pd.read_excel(file_path, sheet_name='Sheet1', header=None)
-        
-        if df.empty:
-            print("No data found in Sheet1")
+        # First, try to get all sheet names
+        try:
+            excel_file = pd.ExcelFile(file_path)
+            sheet_names = excel_file.sheet_names
+            print(f"Available sheets: {sheet_names}")
+        except Exception as e:
+            print(f"Error reading sheet names: {e}")
             return None, None
         
-        print(f"Data loaded successfully! Shape: {df.shape}")
+        # Try different approaches to read the data
+        df = None
+        
+        # Approach 1: Try reading the first sheet with default settings
+        try:
+            df = pd.read_excel(file_path, sheet_name=0, header=None)
+            print(f"Successfully read first sheet: {sheet_names[0] if sheet_names else 'Sheet1'}")
+        except Exception as e:
+            print(f"Error reading first sheet: {e}")
+        
+        # Approach 2: If first approach failed, try reading with different parameters
+        if df is None or df.empty:
+            try:
+                # Try reading with header detection
+                df = pd.read_excel(file_path, sheet_name=0, header=0)
+                print(f"Successfully read with header detection")
+            except Exception as e:
+                print(f"Error reading with header detection: {e}")
+        
+        # Approach 3: Try reading specific sheet names if available
+        if df is None or df.empty:
+            for sheet_name in sheet_names:
+                try:
+                    df = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
+                    if not df.empty:
+                        print(f"Successfully read sheet: {sheet_name}")
+                        break
+                except Exception as e:
+                    print(f"Error reading sheet {sheet_name}: {e}")
+                    continue
+        
+        # Approach 4: Try reading all sheets and combine
+        if df is None or df.empty:
+            try:
+                all_sheets = pd.read_excel(file_path, sheet_name=None, header=None)
+                if all_sheets:
+                    # Combine all sheets
+                    combined_data = []
+                    for sheet_name, sheet_df in all_sheets.items():
+                        if not sheet_df.empty:
+                            combined_data.append(f"\n--- Sheet: {sheet_name} ---\n")
+                            combined_data.append(sheet_df.to_string(index=True, na_rep=''))
+                    
+                    if combined_data:
+                        excel_data = "\n".join(combined_data)
+                        print(f"Successfully read and combined {len(all_sheets)} sheets")
+                        return excel_data, None
+            except Exception as e:
+                print(f"Error reading all sheets: {e}")
+        
+        if df is None or df.empty:
+            print("No data found in any sheet")
+            return None, None
+        
+        print(f"Excel data loaded successfully! Shape: {df.shape}")
         
         # Convert to string representation for LLM analysis
         excel_data = df.to_string(index=True, na_rep='', max_rows=None, max_cols=None)

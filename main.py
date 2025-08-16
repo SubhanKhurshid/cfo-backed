@@ -18,7 +18,7 @@ from api import (
 
 app = FastAPI(
     title="CFO Financial Analysis API",
-    description="Upload financial documents (CSV, XLSX, PDF) and get comprehensive financial analysis including P&L, Balance Sheet, Cash Flow, and AR/AP Aging reports",
+    description="Upload financial documents (CSV, XLSX, XLS, PDF) and get comprehensive financial analysis including P&L, Balance Sheet, Cash Flow, and AR/AP Aging reports",
     version="1.0.0"
 )
 
