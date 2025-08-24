@@ -4,23 +4,19 @@ This guide will help you set up the AI-powered chatbot functionality for your CF
 
 ## Prerequisites
 
-1. **OpenAI API Key**: Required for AI analysis and chat responses
+1. **OpenAI API Key**: Required for AI analysis, chat responses, and generating embeddings
 2. **Pinecone API Key**: Required for vector database storage
-3. **Ollama**: Required for generating embeddings with nomic-embed-text model
 
 ## Environment Variables Setup
 
 Create a `.env` file in the backend directory with the following variables:
 
 ```bash
-# OpenAI API Configuration (for chat responses and analysis)
+# OpenAI API Configuration (for chat responses, analysis, and embeddings)
 OPENAI_API_KEY=your_openai_api_key_here
 
 # Pinecone Vector Database Configuration
 PINECONE_API_KEY=your_pinecone_api_key_here
-
-# Ollama Configuration (optional - defaults to localhost:11434)
-OLLAMA_BASE_URL=http://localhost:11434
 ```
 
 ### Getting API Keys
@@ -37,29 +33,16 @@ OLLAMA_BASE_URL=http://localhost:11434
 3. Navigate to "API Keys" in the sidebar
 4. Copy your API key and add it to your `.env` file
 
-#### Ollama Setup
-1. Install Ollama from [https://ollama.ai/](https://ollama.ai/)
-2. Start Ollama service: `ollama serve` (usually runs on localhost:11434)
-3. Pull the embedding model: `ollama pull nomic-embed-text:latest`
-4. Verify the model is available: `ollama list`
+
 
 ## Installation
 
-1. Install the new dependencies:
+1. Install the dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Make sure Ollama is running with the nomic-embed-text model:
-```bash
-# Start Ollama (if not already running)
-ollama serve
-
-# In another terminal, pull the embedding model
-ollama pull nomic-embed-text:latest
-```
-
-3. The system will automatically create a Pinecone index named `financial-documents` when first started.
+2. The system will automatically create a Pinecone index named `financial-documents` when first started.
 
 ## New API Endpoints
 
@@ -104,7 +87,7 @@ curl -X GET "http://localhost:8000/documents?user_id=user123"
 ### Document Analysis & Storage
 - Automatically extracts and analyzes financial data from uploaded documents
 - Stores analysis results in Pinecone vector database for intelligent search
-- Uses Ollama nomic-embed-text model for generating embeddings (768 dimensions)
+- Uses OpenAI text-embedding-3-small model for generating embeddings (1536 dimensions)
 - Supports CSV, XLSX, XLS, and PDF file formats
 - Chunks data into relevant sections (P&L, Balance Sheet, Cash Flow, etc.)
 
@@ -115,11 +98,11 @@ curl -X GET "http://localhost:8000/documents?user_id=user123"
 - Multi-document support for comprehensive analysis
 
 ### Vector Database Features
-- Semantic search across all financial documents using Ollama embeddings
+- Semantic search across all financial documents using OpenAI embeddings
 - User-specific data isolation
 - Fast retrieval of relevant financial information
 - Support for complex financial queries
-- Fallback to OpenAI embeddings if Ollama is unavailable
+- High-quality embeddings with OpenAI's latest models
 
 ## Data Organization
 
@@ -149,20 +132,11 @@ The system organizes your financial data into the following chunks:
 2. **"OPENAI_API_KEY environment variable not set"**
    - Ensure you've added your OpenAI API key to the `.env` file
 
-3. **"Ollama server not accessible"**
-   - Ensure Ollama is running: `ollama serve`
-   - Check if Ollama is running on the correct port (default: 11434)
-   - Verify the OLLAMA_BASE_URL in your `.env` file
-
-4. **"Model nomic-embed-text:latest not available"**
-   - Pull the model: `ollama pull nomic-embed-text:latest`
-   - Verify it's installed: `ollama list`
-
-5. **"Failed to create Pinecone index"**
+3. **"Failed to create Pinecone index"**
    - Check your Pinecone account limits
    - Ensure you have sufficient quota for a new index
 
-6. **"No relevant financial data found"**
+4. **"No relevant financial data found"**
    - Ensure you've uploaded financial documents with `store_in_vector_db=true`
    - Check that the user_id matches between upload and chat requests
 
@@ -173,18 +147,17 @@ Monitor system health with:
 curl -X GET "http://localhost:8000/health/chatbot"
 ```
 
-This will test connectivity to Pinecone, OpenAI, and Ollama services.
+This will test connectivity to Pinecone and OpenAI services.
 
 ## Advanced Configuration
 
 You can customize the following settings in the code:
 
 - **Index Name**: Default is `financial-documents`
-- **Embedding Model**: Default is `nomic-embed-text:latest` (Ollama)
+- **Embedding Model**: Default is `text-embedding-3-small` (OpenAI)
 - **Chat Model**: Default is `gpt-4o` (OpenAI)
-- **Vector Dimensions**: 768 (matches nomic-embed-text embeddings)
+- **Vector Dimensions**: 1536 (matches text-embedding-3-small embeddings)
 - **Search Results**: Default top_k is 5-8 depending on the operation
-- **Ollama URL**: Default is `http://localhost:11434`
 
 ## Next Steps
 

@@ -2,7 +2,6 @@ import json
 import logging
 from typing import List, Dict, Any, Optional
 from openai import OpenAI
-import ollama
 from dotenv import load_dotenv
 import os
 from pinecone_manager import get_pinecone_manager

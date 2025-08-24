@@ -1,12 +1,10 @@
 import os
 import json
 import uuid
-import requests
 import time
 from typing import List, Dict, Any, Optional
 from pinecone import Pinecone, ServerlessSpec
 from openai import OpenAI
-import ollama
 from dotenv import load_dotenv
 import logging
 
@@ -23,7 +21,7 @@ class PineconeManager:
     """
     
     def __init__(self):
-        """Initialize Pinecone client and Ollama for embeddings"""
+        """Initialize Pinecone client and OpenAI for embeddings"""
         try:
             # Initialize Pinecone
             self.pinecone_api_key = os.getenv("PINECONE_API_KEY")
@@ -32,61 +30,31 @@ class PineconeManager:
             
             self.pc = Pinecone(api_key=self.pinecone_api_key)
             
-            # Initialize OpenAI for chat (still needed for analysis)
+            # Initialize OpenAI for embeddings and chat
             self.openai_api_key = os.getenv("OPENAI_API_KEY")
             if not self.openai_api_key:
                 raise ValueError("OPENAI_API_KEY environment variable not set")
             
             self.openai_client = OpenAI(api_key=self.openai_api_key)
             
-            # Ollama configuration for embeddings
-            self.ollama_base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-            self.embedding_model = "nomic-embed-text:latest"
-            
-            # Test Ollama connection
-            self._test_ollama_connection()
+            # OpenAI embedding model configuration
+            self.embedding_model = "text-embedding-3-small"  # Latest and most efficient OpenAI embedding model
             
             # Pinecone index configuration
             self.index_name = "financial-documents"
-            self.dimension = 768  # nomic-embed-text embedding dimension
+            self.dimension = 1536  # text-embedding-3-small dimension
             self.metric = "cosine"
             
             # Initialize or connect to index
             self._setup_index()
             
-            logger.info("PineconeManager initialized successfully with Ollama embeddings")
+            logger.info("PineconeManager initialized successfully with OpenAI embeddings")
             
         except Exception as e:
             logger.error(f"Failed to initialize PineconeManager: {str(e)}")
             raise
     
-    def _test_ollama_connection(self):
-        """Test connection to Ollama server and verify model availability"""
-        try:
-            # Test if Ollama server is running
-            response = requests.get(f"{self.ollama_base_url}/api/tags", timeout=10)
-            if response.status_code != 200:
-                raise Exception(f"Ollama server not accessible at {self.ollama_base_url}")
-            
-            # Check if the embedding model is available
-            models = response.json()
-            model_names = [model.get('name', '') for model in models.get('models', [])]
-            
-            if self.embedding_model not in model_names:
-                logger.warning(f"Model {self.embedding_model} not found. Attempting to pull...")
-                # Try to pull the model
-                try:
-                    ollama.pull(self.embedding_model)
-                    logger.info(f"Successfully pulled model {self.embedding_model}")
-                except Exception as pull_error:
-                    raise Exception(f"Model {self.embedding_model} not available and failed to pull: {str(pull_error)}")
-            
-            logger.info(f"Ollama connection verified. Model {self.embedding_model} is available.")
-            
-        except requests.exceptions.RequestException as e:
-            raise Exception(f"Failed to connect to Ollama server at {self.ollama_base_url}: {str(e)}")
-        except Exception as e:
-            raise Exception(f"Ollama connection test failed: {str(e)}")
+
     
     def _setup_index(self):
         """Setup Pinecone index for financial documents"""
@@ -121,35 +89,26 @@ class PineconeManager:
             raise
     
     def generate_embedding(self, text: str) -> List[float]:
-        """Generate embedding for given text using Ollama nomic-embed-text model"""
+        """Generate embedding for given text using OpenAI embedding model"""
         try:
-            # Use Ollama to generate embeddings
-            response = ollama.embeddings(
+            # Clean and truncate text if needed (OpenAI has input limits)
+            text = text.strip()
+            if len(text) == 0:
+                text = "Empty document"
+            
+            # Use OpenAI to generate embeddings
+            response = self.openai_client.embeddings.create(
                 model=self.embedding_model,
-                prompt=text
+                input=text
             )
             
-            # Extract embedding from response
-            if 'embedding' in response:
-                embedding = response['embedding']
-                logger.debug(f"Generated embedding of dimension {len(embedding)} for text length {len(text)}")
-                return embedding
-            else:
-                raise Exception("No embedding found in Ollama response")
+            embedding = response.data[0].embedding
+            logger.debug(f"Generated embedding of dimension {len(embedding)} for text length {len(text)}")
+            return embedding
                 
         except Exception as e:
-            logger.error(f"Failed to generate embedding with Ollama: {str(e)}")
-            # Fallback to OpenAI if Ollama fails
-            logger.warning("Falling back to OpenAI embeddings")
-            try:
-                response = self.openai_client.embeddings.create(
-                    model="text-embedding-ada-002",
-                    input=text
-                )
-                return response.data[0].embedding
-            except Exception as openai_error:
-                logger.error(f"OpenAI fallback also failed: {str(openai_error)}")
-                raise Exception(f"Both Ollama and OpenAI embedding generation failed. Ollama: {str(e)}, OpenAI: {str(openai_error)}")
+            logger.error(f"Failed to generate embedding with OpenAI: {str(e)}")
+            raise Exception(f"OpenAI embedding generation failed: {str(e)}")
     
     def prepare_financial_data_for_storage(self, 
                                          financial_analysis: Dict[Any, Any], 
