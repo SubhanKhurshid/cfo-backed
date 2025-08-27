@@ -9,13 +9,16 @@ import shutil
 from typing import Dict, Any, Optional, List
 import uvicorn
 import logging
+import io
+from contextlib import redirect_stdout
 
 # Import our existing financial analysis functions
 from api import (
     read_financial_file, 
     analyze_financial_data, 
     detect_file_type,
-    read_csv_file  # We'll add this function
+    read_csv_file,
+    display_results  # Import the display function for consistent output
 )
 
 # Import Pinecone integration and chatbot
@@ -140,6 +143,15 @@ async def upload_financial_document(
                 status_code=500,
                 detail=f"Analysis failed: {analysis_result['error']}"
             )
+            
+        # Validate monthly analysis data - ensure all detected months have metrics
+        if "monthly_analysis" in analysis_result:
+            months_detected = analysis_result["monthly_analysis"].get("months_detected", [])
+            per_month_metrics = analysis_result["monthly_analysis"].get("per_month_metrics", [])
+            
+            # If we detected months but don't have complete metrics, log a warning
+            if months_detected and len(months_detected) > len(per_month_metrics):
+                logger.warning(f"Missing month metrics in API response: {len(months_detected)} months detected, but only {len(per_month_metrics)} have metrics")
         
         # Prepare file info
         file_info = {
@@ -163,10 +175,20 @@ async def upload_financial_document(
                 logger.error(f"Failed to store in vector database: {str(e)}")
                 # Don't fail the entire request if vector storage fails
         
+        # Process the analysis result to ensure it displays similar to api.py
+        # Capture output to include in response
+        
+        f = io.StringIO()
+        with redirect_stdout(f):
+            display_results(analysis_result)
+            
+        formatted_output = f.getvalue()
+        
         # Add metadata to response
         response_data = {
             "file_info": file_info,
             "analysis": analysis_result,
+            "formatted_analysis": formatted_output
         }
         
         return JSONResponse(content=response_data)
@@ -251,6 +273,15 @@ async def analyze_multiple_files(
                 analysis_result = analyze_financial_data(financial_data, file_type)
                 
                 if "error" not in analysis_result:
+                    # Validate monthly analysis data - ensure all detected months have metrics
+                    if "monthly_analysis" in analysis_result:
+                        months_detected = analysis_result["monthly_analysis"].get("months_detected", [])
+                        per_month_metrics = analysis_result["monthly_analysis"].get("per_month_metrics", [])
+                        
+                        # If we detected months but don't have complete metrics, log a warning
+                        if months_detected and len(months_detected) > len(per_month_metrics):
+                            logger.warning(f"Missing month metrics in API response for {file.filename}: {len(months_detected)} months detected, but only {len(per_month_metrics)} have metrics")
+                    
                     file_info = {
                         "filename": file.filename,
                         "file_type": file_type,
@@ -273,9 +304,18 @@ async def analyze_multiple_files(
                             logger.error(f"Failed to store {file.filename} in vector database: {str(e)}")
                             # Don't fail the entire request if vector storage fails
                     
+                    # Format analysis results the same way api.py would
+                    
+                    f = io.StringIO()
+                    with redirect_stdout(f):
+                        display_results(analysis_result)
+                        
+                    formatted_output = f.getvalue()
+                    
                     results[file.filename] = {
                         "file_info": file_info,
                         "analysis": analysis_result,
+                        "formatted_analysis": formatted_output
                     }
         
         return JSONResponse(content={
