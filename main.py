@@ -16,6 +16,7 @@ from contextlib import redirect_stdout
 from api import (
     read_financial_file, 
     analyze_financial_data, 
+    analyze_multi_file_data,
     detect_file_type,
     read_csv_file,
     display_results  # Import the display function for consistent output
@@ -223,7 +224,7 @@ async def analyze_multiple_files(
     Upload multiple financial documents and get combined analysis
     
     Supported formats: CSV, XLSX, XLS, PDF
-    Returns: JSON with analysis for each file plus combined insights
+    Returns: JSON with combined analysis of all files together
     Optionally stores analysis in vector database for chatbot functionality
     """
     
@@ -233,11 +234,12 @@ async def analyze_multiple_files(
             detail="Too many files. Maximum 10 files allowed per request."
         )
     
-    results = {}
     temp_files = []
-    document_ids = []
+    combined_financial_data = []
+    file_info_list = []
     
     try:
+        # Step 1: Process all files and extract their content
         for file in files:
             # Validate each file
             file_extension = Path(file.filename).suffix.lower()
@@ -266,66 +268,89 @@ async def analyze_multiple_files(
             with open(temp_file_path, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
             
-            # Process the file
+            # Extract financial data from the file
             financial_data, file_type = read_financial_file(temp_file_path)
             
             if financial_data is not None:
-                analysis_result = analyze_financial_data(financial_data, file_type)
+                # Add file separator and content to combined data
+                combined_financial_data.append(f"\n{'='*50}")
+                combined_financial_data.append(f"FILE: {file.filename} (Type: {file_type.upper()})")
+                combined_financial_data.append(f"{'='*50}")
+                combined_financial_data.append(financial_data)
+                combined_financial_data.append(f"\n{'='*50}")
                 
-                if "error" not in analysis_result:
-                    # Validate monthly analysis data - ensure all detected months have metrics
-                    if "monthly_analysis" in analysis_result:
-                        months_detected = analysis_result["monthly_analysis"].get("months_detected", [])
-                        per_month_metrics = analysis_result["monthly_analysis"].get("per_month_metrics", [])
-                        
-                        # If we detected months but don't have complete metrics, log a warning
-                        if months_detected and len(months_detected) > len(per_month_metrics):
-                            logger.warning(f"Missing month metrics in API response for {file.filename}: {len(months_detected)} months detected, but only {len(per_month_metrics)} have metrics")
-                    
-                    file_info = {
-                        "filename": file.filename,
-                        "file_type": file_type,
-                        "file_size_mb": round(file_size / (1024*1024), 2)
-                    }
-                    
-                    # Store in vector database if requested
-                    document_id = None
-                    if store_in_vector_db:
-                        try:
-                            pinecone_manager = get_pinecone_manager()
-                            document_id = pinecone_manager.store_financial_data(
-                                financial_analysis=analysis_result,
-                                file_info=file_info,
-                                user_id=user_id
-                            )
-                            document_ids.append(document_id)
-                            logger.info(f"Stored document {file.filename} in vector database with ID: {document_id}")
-                        except Exception as e:
-                            logger.error(f"Failed to store {file.filename} in vector database: {str(e)}")
-                            # Don't fail the entire request if vector storage fails
-                    
-                    # Format analysis results the same way api.py would
-                    
-                    f = io.StringIO()
-                    with redirect_stdout(f):
-                        display_results(analysis_result)
-                        
-                    formatted_output = f.getvalue()
-                    
-                    results[file.filename] = {
-                        "file_info": file_info,
-                        "analysis": analysis_result,
-                        "formatted_analysis": formatted_output
-                    }
+                # Store file info
+                file_info_list.append({
+                    "filename": file.filename,
+                    "file_type": file_type,
+                    "file_size_mb": round(file_size / (1024*1024), 2)
+                })
+            else:
+                logger.warning(f"Could not extract data from file: {file.filename}")
+        
+        if not combined_financial_data:
+            raise HTTPException(
+                status_code=400,
+                detail="Could not extract data from any of the uploaded files."
+            )
+        
+        # Step 2: Combine all financial data and analyze together
+        combined_data_string = "\n".join(combined_financial_data)
+        
+        # Use a modified analysis function for multi-file analysis
+        combined_analysis_result = analyze_multi_file_data(combined_data_string, file_info_list)
+        
+        if "error" in combined_analysis_result:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Combined analysis failed: {combined_analysis_result['error']}"
+            )
+        
+        # Step 3: Create combined file info
+        combined_filename = "_".join([f.split('.')[0] for f in [info["filename"] for info in file_info_list]]) + "_combined"
+        total_size_mb = sum([info["file_size_mb"] for info in file_info_list])
+        
+        combined_file_info = {
+            "filename": combined_filename,
+            "original_files": [info["filename"] for info in file_info_list],
+            "file_type": "combined",
+            "file_size_mb": total_size_mb,
+            "files_count": len(file_info_list)
+        }
+        
+        # Step 4: Store in vector database as single entry if requested
+        document_id = None
+        if store_in_vector_db:
+            try:
+                pinecone_manager = get_pinecone_manager()
+                document_id = pinecone_manager.store_financial_data(
+                    financial_analysis=combined_analysis_result,
+                    file_info=combined_file_info,
+                    user_id=user_id
+                )
+                logger.info(f"Stored combined analysis in vector database with ID: {document_id}")
+            except Exception as e:
+                logger.error(f"Failed to store combined analysis in vector database: {str(e)}")
+                # Don't fail the entire request if vector storage fails
+        
+        # Step 5: Format the results
+        f = io.StringIO()
+        with redirect_stdout(f):
+            display_results(combined_analysis_result)
+            
+        formatted_output = f.getvalue()
         
         return JSONResponse(content={
-            "files_processed": len(results),
-            "results": results,
+            "file_info": combined_file_info,
+            "analysis": combined_analysis_result,
+            "formatted_analysis": formatted_output,
+            "document_id": document_id
         })
         
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Multi-file analysis error: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Internal server error: {str(e)}"

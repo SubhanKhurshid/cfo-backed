@@ -28,7 +28,18 @@ class PineconeManager:
             if not self.pinecone_api_key:
                 raise ValueError("PINECONE_API_KEY environment variable not set")
             
+            # Initialize Pinecone client
             self.pc = Pinecone(api_key=self.pinecone_api_key)
+            
+            # Test basic API access
+            try:
+                test_indexes = self.pc.list_indexes()
+                logger.info(f"Pinecone API key validated successfully. Found {len(test_indexes)} indexes.")
+            except Exception as api_error:
+                logger.error(f"Pinecone API key validation failed: {api_error}")
+                raise ValueError(f"Invalid Pinecone API key or connection issue: {api_error}")
+            
+            logger.info("Pinecone client initialized successfully")
             
             # Initialize OpenAI for embeddings and chat
             self.openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -48,23 +59,50 @@ class PineconeManager:
             # Initialize or connect to index
             self._setup_index()
             
-            logger.info("PineconeManager initialized successfully with OpenAI embeddings")
+            # Test the connection
+            connection_ok = self.test_connection()
+            if connection_ok:
+                logger.info("PineconeManager initialized successfully with OpenAI embeddings")
+            else:
+                logger.warning("PineconeManager initialized but connection test failed")
             
         except Exception as e:
             logger.error(f"Failed to initialize PineconeManager: {str(e)}")
+            logger.error(f"Error type: {type(e).__name__}")
             raise
     
-
+    def test_connection(self):
+        """Test the Pinecone connection and return diagnostics"""
+        try:
+            # Test 1: List indexes
+            indexes = self.pc.list_indexes()
+            logger.info(f"Available indexes: {[idx.name for idx in indexes]}")
+            
+            # Test 2: Get index stats if connected
+            if hasattr(self, 'index'):
+                stats = self.index.describe_index_stats()
+                logger.info(f"Index stats: {stats}")
+                return True
+            else:
+                logger.warning("No index connection established")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Connection test failed: {str(e)}")
+            logger.error(f"Error type: {type(e).__name__}")
+            return False
     
     def _setup_index(self):
         """Setup Pinecone index for financial documents"""
         try:
             # Check if index exists
+            logger.info("Checking for existing Pinecone indexes...")
             existing_indexes = self.pc.list_indexes()
             index_names = [idx.name for idx in existing_indexes]
+            logger.info(f"Found existing indexes: {index_names}")
             
             if self.index_name not in index_names:
-                logger.info(f"Creating new Pinecone index: {self.index_name}")
+                logger.info(f"Index '{self.index_name}' not found. Creating new index...")
                 
                 # Create index with serverless spec
                 self.pc.create_index(
@@ -76,16 +114,33 @@ class PineconeManager:
                         region='us-east-1'
                     )
                 )
-                logger.info(f"Index {self.index_name} created successfully")
+                logger.info(f"Index '{self.index_name}' created successfully")
+                
+                # Wait for index to be ready
+                logger.info("Waiting for index to be ready...")
+                time.sleep(10)  # Give index time to initialize
+                
             else:
-                logger.info(f"Index {self.index_name} already exists")
+                logger.info(f"Index '{self.index_name}' already exists")
             
             # Connect to the index
+            logger.info(f"Connecting to index: {self.index_name}")
             self.index = self.pc.Index(self.index_name)
-            logger.info(f"Connected to index: {self.index_name}")
+            
+            # Test the connection by getting index stats
+            try:
+                stats = self.index.describe_index_stats()
+                logger.info(f"Connected to index successfully. Stats: {stats}")
+            except Exception as connect_error:
+                logger.warning(f"Index connection test failed: {connect_error}")
+                # Wait a bit more and try again
+                time.sleep(5)
+                self.index = self.pc.Index(self.index_name)
+                logger.info("Reconnected to index after delay")
             
         except Exception as e:
             logger.error(f"Failed to setup Pinecone index: {str(e)}")
+            logger.error(f"Error type: {type(e).__name__}")
             raise
     
     def generate_embedding(self, text: str) -> List[float]:
@@ -361,8 +416,25 @@ class PineconeManager:
                     }
                 })
             
-            # Upsert vectors to Pinecone
-            self.index.upsert(vectors=vectors)
+            # Upsert vectors to Pinecone with retry logic
+            try:
+                self.index.upsert(vectors=vectors)
+            except Exception as upsert_error:
+                logger.warning(f"Initial upsert failed: {upsert_error}")
+                logger.info("Attempting to reconnect to index and retry...")
+                
+                # Check if it's a domain/connection issue - try to reconnect
+                if "domain" in str(upsert_error).lower() or "unauthorized" in str(upsert_error).lower():
+                    try:
+                        # Reinitialize the index connection
+                        self._setup_index()
+                        logger.info("Reconnected to index, retrying upsert...")
+                        self.index.upsert(vectors=vectors)
+                    except Exception as retry_error:
+                        logger.error(f"Retry failed: {retry_error}")
+                        raise retry_error
+                else:
+                    raise upsert_error
             
             doc_id = chunks[0]["metadata"]["document_id"]
             logger.info(f"Successfully stored {len(vectors)} vectors for document {file_info.get('filename')} with doc_id: {doc_id}")
@@ -371,6 +443,7 @@ class PineconeManager:
             
         except Exception as e:
             logger.error(f"Failed to store financial data: {str(e)}")
+            logger.error(f"Error type: {type(e).__name__}")
             raise
     
     def query_financial_data(self, 

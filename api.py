@@ -1070,6 +1070,259 @@ IMPORTANT: Return ONLY valid JSON. No explanations, no markdown, no additional t
     except Exception as e:
         return {"error": f"API call failed: {str(e)}"}
 
+def extract_key_totals_from_data(data_chunk, filename):
+    """Extract key financial totals from a single file's data"""
+    try:
+        # Use a quick analysis to extract just the key totals
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a financial analyst. Extract key financial totals from this data and return ONLY a JSON object with the totals."},
+                {"role": "user", "content": f"""
+Extract ONLY the key financial totals from this data for file: {filename}
+
+Data:
+{data_chunk[:5000]}  # Limit to avoid token overflow
+
+Return ONLY this JSON format:
+{{
+  "filename": "{filename}",
+  "total_revenue": 0.00,
+  "total_expenses": 0.00,
+  "total_assets": 0.00,
+  "total_liabilities": 0.00,
+  "cash": 0.00,
+  "accounts_receivable": 0.00,
+  "accounts_payable": 0.00
+}}
+
+Return ONLY valid JSON, no explanations.
+"""}
+            ],
+            max_tokens=1000
+        )
+        
+        result = response.choices[0].message.content.strip()
+        # Clean JSON response
+        if result.startswith("```json"):
+            result = result[7:]
+        if result.startswith("```"):
+            result = result[3:]
+        if result.endswith("```"):
+            result = result[:-3]
+        
+        import json
+        return json.loads(result.strip())
+    except Exception as e:
+        print(f"Error extracting totals from {filename}: {e}")
+        return {
+            "filename": filename,
+            "total_revenue": 0.00,
+            "total_expenses": 0.00,
+            "total_assets": 0.00,
+            "total_liabilities": 0.00,
+            "cash": 0.00,
+            "accounts_receivable": 0.00,
+            "accounts_payable": 0.00
+        }
+
+def analyze_multi_file_data(combined_data, file_info_list):
+    """Analyze multiple financial files together for combined insights"""
+    try:
+        system_prompt = create_system_prompt()
+        
+        # Create a comprehensive prompt for multi-file analysis
+        file_names = [info["filename"] for info in file_info_list]
+        file_types = [info["file_type"] for info in file_info_list]
+        
+        # Extract individual file totals first for verification
+        print("Extracting individual file totals for combination verification...")
+        individual_totals = []
+        file_sections = combined_data.split("=" * 50)
+        
+        for i, file_info in enumerate(file_info_list):
+            # Find the data section for this file
+            file_data = ""
+            for section in file_sections:
+                if f"FILE: {file_info['filename']}" in section:
+                    file_data = section
+                    break
+            
+            if file_data:
+                totals = extract_key_totals_from_data(file_data, file_info['filename'])
+                individual_totals.append(totals)
+                print(f"File {file_info['filename']}: Revenue={totals.get('total_revenue', 0)}, Assets={totals.get('total_assets', 0)}")
+        
+        # Calculate expected combined totals
+        expected_totals = {
+            "total_revenue": sum(t.get('total_revenue', 0) for t in individual_totals),
+            "total_expenses": sum(t.get('total_expenses', 0) for t in individual_totals),
+            "total_assets": sum(t.get('total_assets', 0) for t in individual_totals),
+            "total_liabilities": sum(t.get('total_liabilities', 0) for t in individual_totals),
+            "cash": sum(t.get('cash', 0) for t in individual_totals),
+            "accounts_receivable": sum(t.get('accounts_receivable', 0) for t in individual_totals),
+            "accounts_payable": sum(t.get('accounts_payable', 0) for t in individual_totals),
+        }
+        
+        print(f"Expected combined totals: {expected_totals}")
+        
+        # Add explicit mathematical guidance with actual numbers
+        totals_breakdown = "\n".join([
+            f"File: {t['filename']} - Revenue: {t.get('total_revenue', 0)}, Expenses: {t.get('total_expenses', 0)}, Assets: {t.get('total_assets', 0)}"
+            for t in individual_totals
+        ])
+        
+        math_guidance = f"""
+MATHEMATICAL COMBINATION GUIDE:
+- You are analyzing {len(file_info_list)} separate financial files
+- Each file represents separate financial data that should be ADDED TOGETHER
+- Think of this as consolidating {len(file_info_list)} separate business units or time periods
+
+INDIVIDUAL FILE TOTALS DETECTED:
+{totals_breakdown}
+
+REQUIRED COMBINED TOTALS (MUST MATCH THESE EXACTLY):
+- Combined Revenue: {expected_totals['total_revenue']:,.2f}
+- Combined Expenses: {expected_totals['total_expenses']:,.2f}
+- Combined Assets: {expected_totals['total_assets']:,.2f}
+- Combined Liabilities: {expected_totals['total_liabilities']:,.2f}
+- Combined Cash: {expected_totals['cash']:,.2f}
+- Combined A/R: {expected_totals['accounts_receivable']:,.2f}
+- Combined A/P: {expected_totals['accounts_payable']:,.2f}
+
+VERIFICATION CHECKLIST:
+✓ Does total_revenue = {expected_totals['total_revenue']:,.2f}?
+✓ Does total_expenses = {expected_totals['total_expenses']:,.2f}?
+✓ Does total_assets = {expected_totals['total_assets']:,.2f}?
+"""
+        
+        user_message = f"""
+Analyze these {len(file_info_list)} financial documents together as a COMBINED analysis:
+
+Files being analyzed: {', '.join(file_names)}
+File types: {', '.join(file_types)}
+
+⚠️ CRITICAL INSTRUCTIONS FOR COMBINING FINANCIAL DATA ⚠️
+
+1. **MATHEMATICAL COMBINATION REQUIRED**: You MUST add up all financial totals across ALL files
+   - Total Revenue = Sum of revenue from ALL files
+   - Total Expenses = Sum of expenses from ALL files
+   - Total Assets = Sum of assets from ALL files
+   - Total Liabilities = Sum of liabilities from ALL files
+   - Cash = Sum of cash from ALL files
+   - ALL numerical values must be the mathematical SUM across files
+
+2. **STEP-BY-STEP PROCESS**:
+   - First: Identify each financial metric in each file
+   - Second: Add them together mathematically
+   - Third: Use the combined totals in your analysis
+
+3. **VERIFICATION**: Before finalizing, double-check that:
+   - Revenue total = File1_Revenue + File2_Revenue + ... 
+   - Expense total = File1_Expenses + File2_Expenses + ...
+   - Asset total = File1_Assets + File2_Assets + ...
+
+4. **EXAMPLE**: If File1 has revenue 213,200 and File2 has revenue 143,831, 
+   then total_revenue MUST be 357,031 (213,200 + 143,831)
+
+{math_guidance}
+
+Combined financial data:
+{combined_data}
+
+IMPORTANT: Return ONLY valid JSON with the same structure as single file analysis but with MATHEMATICALLY COMBINED totals.
+
+The analysis should represent the CONSOLIDATED financial position across all files, not an average or single file's data.
+
+REMEMBER: You are CONSOLIDATING {len(file_info_list)} separate financial documents - ADD UP ALL THE NUMBERS!
+"""
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ],
+            max_tokens=16000
+        )
+        
+        analysis_result = response.choices[0].message.content
+        if analysis_result is None:
+            print("ERROR: AI returned None response for multi-file analysis")
+            return {"error": "AI model returned empty response"}
+        
+        analysis_result = analysis_result.strip()
+        print(f"Multi-file analysis response length: {len(analysis_result)} characters")
+        
+        # Check if response is empty
+        if not analysis_result:
+            print("ERROR: AI returned empty response for multi-file analysis")
+            return {"error": "AI model returned empty response"}
+        
+        # Clean the response
+        analysis_result = analysis_result.strip()
+        
+        # Remove markdown code blocks if present
+        if analysis_result.startswith("```json"):
+            analysis_result = analysis_result[7:]
+        if analysis_result.startswith("```"):
+            analysis_result = analysis_result[3:]
+        if analysis_result.endswith("```"):
+            analysis_result = analysis_result[:-3]
+        
+        analysis_result = analysis_result.strip()
+        
+        # Parse JSON response
+        try:
+            parsed_result = json.loads(analysis_result)
+            
+            # Add metadata about the combined analysis
+            parsed_result["multi_file_info"] = {
+                "files_analyzed": file_names,
+                "file_types": file_types,
+                "analysis_type": "combined_multi_file"
+            }
+            
+            # Ensure complete structure
+            parsed_result = ensure_complete_structure(parsed_result)
+            
+            return parsed_result
+            
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error in multi-file analysis: {e}")
+            print(f"Raw response: {analysis_result[:500]}...")
+            
+            # Try to fix common JSON issues
+            try:
+                # Remove trailing commas and fix common issues
+                fixed_result = analysis_result.replace(',}', '}').replace(',]', ']')
+                parsed_result = json.loads(fixed_result)
+                
+                # Add metadata
+                parsed_result["multi_file_info"] = {
+                    "files_analyzed": file_names,
+                    "file_types": file_types,
+                    "analysis_type": "combined_multi_file"
+                }
+                
+                parsed_result = ensure_complete_structure(parsed_result)
+                return parsed_result
+                
+            except:
+                print("Failed to parse multi-file analysis JSON, using fallback")
+                return {
+                    "error": "Failed to parse AI response as JSON",
+                    "multi_file_info": {
+                        "files_analyzed": file_names,
+                        "file_types": file_types,
+                        "analysis_type": "combined_multi_file"
+                    }
+                }
+                
+    except Exception as e:
+        print(f"Multi-file analysis error: {str(e)}")
+        return {"error": f"Multi-file analysis failed: {str(e)}"}
+
 def ensure_complete_structure(parsed_result):
     """Ensure the response has all required sections with simplified structure"""
     
